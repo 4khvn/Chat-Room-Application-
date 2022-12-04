@@ -20,8 +20,11 @@ class Client:
     def __init__(self,server_ip, port, client_ip):
         self.master = tk.Tk()
         self.master.geometry("600x600")
+        self.master.configure(bg='grey')
         self.input = "NULL"
-        self.master.title("A simple GUI")
+        self.master.title("Multiuser Chat Application")
+        self.label3 = tk.Label(self.master,
+              text="By Muhammad Anas Khan & Ahsan Raza", font=("Arial", 6)).place(x=450,y=586)
         self.PORT = port										#server's port to connect to
         self.CLIENT_IP = client_ip
         self.A = tk.StringVar()
@@ -39,11 +42,10 @@ class Client:
         self.button = tk.Button(self.master,text="Click to connect to server", command=lambda: self.connectToServer())
         self.B = tk.StringVar()
         self.B.set("")
-        self.label2 = tk.Label(self.master,textvariable=self.B)
-        self.label2.place(x=30,y=230)
+        
         self.button.pack()
         self.label.pack()
-        self.entr = tk.Text(self.master)
+        self.entr = tk.Text(self.master,height=19,width=76)
         self.master.mainloop()
 
     def connectToServer(self):
@@ -57,6 +59,8 @@ class Client:
         thread=threading.Thread(target=self.listen_client)
         thread.start()
         self.button.pack_forget()
+        self.label2 = tk.Label(self.master,font=("Arial",19),textvariable=self.B)
+        self.label2.place(x=30,y=230)
         self.B.set("Received:")
         self.button1.place(x=400,y=170)
         self.entr.place(x=5,y=265)
@@ -105,7 +109,7 @@ class Client:
     def functionality(self,my_input):
         
             
-            
+            self.entry3.delete(0,'end')
             my_input_list=my_input.split()
             
             if(my_input_list[0] == "CREATE_USER") :
@@ -304,6 +308,7 @@ class Client:
             self.send(self.user_key_pair.imd_key,cli_server)
             sk=self.recieve_message(cli_server)
             sk=Diffie_Hellman(self.user_key_pair.private_key).create_shared_key(sk)
+            #self.entr.insert(tk.END,"you ->" + " " )
             message=self.current_userid+" : "+message
         else:
             msg="GROUP "+group
@@ -311,6 +316,8 @@ class Client:
             sk=self.user_key_pair.groups[group]
             sk=int(sk)
             message=self.current_userid+"->"+group+":"+message
+
+            #self.entr.insert(tk.END,'you ->' + group + ' ')
         self.encrypted_send(message,sk,cli_server)
 
 
@@ -504,6 +511,8 @@ class Client:
         msg=self.recieve_message_decrypt(sk,conn)
         if msg.find("fIlE")!=-1:
             self.print_msg(msg[:-4])
+            print("wq")
+            print(msg[:-4])
             self.entr.insert(tk.END, msg[:-4] + '\n')
             self.handle_client_file(conn,sk)
         else:
